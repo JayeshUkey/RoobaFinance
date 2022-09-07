@@ -1,33 +1,9 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-contract ERC20Basic {
-    string public constant name = "Rooba Gold Token";
-    string public constant symbol = "RGT";
-    uint8 public constant decimals = 1;
 
-    event Approval(
-        address indexed tokenOwner,
-        address indexed spender,
-        uint tokens
-    );
-    event Transfer(address indexed from, address indexed to, uint tokens);
 
-    mapping(address => uint256) balances;
-
-    mapping(address => mapping(address => uint256)) allowed;
-
-    uint256 totalSupply_;
-
-    using SafeMath for uint256;
-
-    constructor(uint256 total) public {
-        totalSupply_ = total;
-        balances[msg.sender] = totalSupply_;
-    }
-
-    function totalSupply() public view returns (uint256) {
-        return totalSupply_;
-    }
+contract Trading is GoldToken, TetherToken{
 
     function balanceOf(address tokenOwner) public view returns (uint) {
         return balances[tokenOwner];
@@ -56,7 +32,7 @@ contract ERC20Basic {
     }
 
 
-    //Trading functionality
+        //Trading functionality
     uint256 public constant tokenPrice = 5; // 1 token for 5 tether
     
     function buy(uint256 _amount) external payable {
@@ -77,13 +53,9 @@ contract ERC20Basic {
         increment the token balance of this contract
         balances[address(this)] += _amount;
 
-        /*
-         * don't forget to emit the transfer event
-         * so that external apps can reflect the transfer
-         */
         emit Transfer(msg.sender, address(this), _amount);
         
-        // e.g. the user is selling 100 tokens, send them 500 wei
+        // e.g. the user is selling 100 tokens, send them 500 tether
         payable(msg.sender).transfer(amount * tokenPrice);
     }
 
