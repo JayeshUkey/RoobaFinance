@@ -204,7 +204,7 @@ contract Futures is Lockable, Whitelist, IPositionManager {
 
         emit Deposit(trader, collateralAmount);
 
-        // FIXME: Use safeTransferFrom
+        // Use safeTransferFrom
         collateralCurrency.transferFrom(
             trader,
             address(this),
@@ -248,7 +248,7 @@ contract Futures is Lockable, Whitelist, IPositionManager {
             "withdraw margin"
         );
 
-        // FIXME: Use safeTransferFrom
+        // Use safeTransferFrom
         collateralCurrency.transfer(trader, collateralAmount);
     }
 
@@ -421,9 +421,7 @@ contract Futures is Lockable, Whitelist, IPositionManager {
         int256 rpnl = _calculatePnl(account, currentMarkPrice, account.size);
         account.rawCollateral = account.rawCollateral.add(rpnl);
         account.entryValue = currentMarkPrice.wmul(account.size);
-        account.entrySocialLoss = socialLossPerContract(account.side).wmul(
-            account.size.toInt256()
-        );
+
         account.entryFundingLoss = amm
             .currentAccumulatedFundingPerContract()
             .wmul(account.size.toInt256());
@@ -477,9 +475,6 @@ contract Futures is Lockable, Whitelist, IPositionManager {
         }
         account.size = account.size.add(amount);
         account.entryValue = account.entryValue.add(price.wmul(amount));
-        account.entrySocialLoss = account.entrySocialLoss.add(
-            socialLossPerContract(side).wmul(amount.toInt256())
-        );
         account.entryFundingLoss = account.entryFundingLoss.add(
             amm.currentAccumulatedFundingPerContract().wmul(amount.toInt256())
         );
@@ -493,10 +488,6 @@ contract Futures is Lockable, Whitelist, IPositionManager {
     ) internal returns (int256) {
         int256 rpnl = _calculatePnl(account, price, amount);
         account.rawCollateral = account.rawCollateral.add(rpnl);
-        account.entrySocialLoss = account
-            .entrySocialLoss
-            .wmul(account.size.sub(amount).toInt256())
-            .wdiv(account.size.toInt256());
         account.entryFundingLoss = account
             .entryFundingLoss
             .wmul(account.size.sub(amount).toInt256())
